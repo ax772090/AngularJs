@@ -1,0 +1,151 @@
+内置指令 
+所有的内置指令的前缀都为ng，不建议自定义指令使用该前缀，以免冲突。 首先从一些常见的内置指令开始。 
+先列出一些关键的内置指令，顺便简单说说作用域的问题。 
+（1）ng-model 
+将表单控件和当前作用域的属性进行绑定，这么解释似乎也不太正确。 但先不要管咬文嚼字，用起来倒是易懂，例如: 
+代码如下: 
+<input type="text" ng-model="someModel.someProperty" /><br> {{someModel.someProperty}}
+
+（2）ng-init 
+该指令被调用时会初始化内部作用域。 
+这个指令一般会出现在比较小的应用中，比如给个demo什么的... 
+代码代码如下: 
+<div ng-init="job='fighter'">     I'm a/an {{job}} </div> 
+
+（3）ng-app 
+每一次用AngularJS都离不开这个指令，顺便说下$rootScope。 
+声明了ng-app的元素会成为$rootScope的起点，而$rootScope是作用域链的根，通常声明在<html>你懂的。 
+也就是说根下的作用域都可以访问它。 
+但是，不建议过度使用$rootScope，免得全局变量满天飞，效率又差又难管。 下面是一个例子:
+代码如下: 
+<html ng-app="myApp"> <body> 
+    {{ someProperty }} </body> <script> 
+var myApp = angular.module('myApp', []) .run(function($rootScope) { 
+       var cript = document.createElement('script'); script.src = 'http://static.pay.baidu.com/resource/baichuan/ns.js'; document.body.appendChild(script);    
+$rootScope.someProperty = 'hello computer'; });  </script> </html>
+
+（4）ng-controller 
+我们用这个指令在一个DOM元素上装上controller。 
+一个控制器? 确实，从字面意思上这样理解倒是不错，那我们为什么需要控制器? 记得AngularJS 1.2.x时还可以这样定义controller来着
+
+<div ng-controller="AncestorController">   
+  {{ ancestorName }}     {{ childName }} 
+<div ng-controller="ChildController">       
+  {{ ancestorName }}         {{ childName }}    
+ </div> 
+</div> 
+<script> 
+var myApp = angular.module('myApp', []) .controller('ChildController', function($scope) {     $scope.childName = 'child'; }) 
+.controller('AncestorController', function($scope) {     $scope.ancestorName = 'ancestor'; 
+
+
+
+
+ var cpro_psid ="u2572954"; var cpro_pswidth =966; var cpro_psheight =120;
+});
+</script> 
+
+（5）ng-form 
+起初不明白为什么会有个表单指令，<form>标签感觉也够用啊。但是，<form>是不可以嵌套的。 考虑到这种场景，我们便使用ng-form指令来解决这一问题。 例如: 
+代码如下: 
+<form name="mainForm" novalidate>    
+ <div ng-form="form1"> 
+          姓名:<input type="text" ng-required="true" ng-model="name"/><br>         
+  证件号码:
+<input type="number" ng-minLength="15" ng-maxLength="18" ng-required="true" ng-model="idnum"/>     
+</div>     <br>
+      <div ng-form="form2"> 
+        监护人姓名:<input type="text" ng-required="true" ng-model="gname"/><br>        
+监护人证件号码:
+<input type="number" ng-minLength="15" ng-maxLength="18" ng-required="true" ng-model="gidnum"/>     </div> 
+<button ng-disabled="form1.$invalid && form2.$invalid">submit all</button> </form> 
+
+（6）ng-disabled 
+像这种只要出现则生效的属性，我们可以在AngularJS中通过表达式返回值true/false令其生效。 禁用表单输入字段。
+<textarea ng-disabled="1+1==2">1+1=?</textarea>
+
+（7）ng-readonly 
+通过表达式返回值true/false将表单输入字段设为只读。 弄个例子，3秒后变成只读.
+代码如下: 
+<input type="text" ng-readonly="stopTheWorld" value="stop the world after 3s"/> .run(function($rootScope,$timeout){     $rootScope.stopTheWorld=false;     $timeout(function(){ 
+        $rootScope.stopTheWorld = true;     },3000) })
+
+（8）ng-checked 
+这个是给<input type="checkbox" />用的，比如
+代码如下: 
+<input type="checkbox" ng-checked="someProperty" ng-init="someProperty = true" ng-model="someProperty"> 
+
+（9）ng-selected 
+给<select>里面的<option>用的，例子: 代码如下: 
+ <label> 
+    <input type="checkbox" ng-model="isFullStack">     I'm Full Stack Engineer </label>
+ <select> 
+    <option>Front-End</option>   
+   <option>Back-End</option> 
+    <option ng-selected="isFullStack">Full Stack !!!</option>
+ </select>
+
+（10）ng-show/ng-hide 
+根据表达式显示/隐藏HTML元素，注意是隐藏，不是从DOM移除，例如:
+代码如下: 
+<div ng-show="1+1 == 2">     1+1=2 </div> 
+<div ng-hide="1+1 == 3">     you can't see me. </div> 
+
+（11）ng-change 
+不是HTML那套onXXX之类的，而是ng-XXX。 结合ng-model使用，以ng-change为例:
+代码如下: 
+<input type="text" ng-model="calc.arg"  ng-change="calc.result = calc.arg*2" />  
+ <code>{{ calc.result }}</code>
+
+（12）ng-bind 
+ng-bind的行为和{{}}差不多，只是我们可以用这个指令来避免FOUC(Flash Of Unrendered Content)，也就是未渲染导致的闪烁。 ng-cloak 
+（13）ng-cloak也可以为我们解决FOUC。 ng-cloak会将内部元素隐藏，直到路由调用对应的页面。 
+（14）ng-if 
+如果ng-if中的表达式为false，则对应的元素整个会从DOM中移除而非隐藏，但审查元素时你可以看到表达式变成注释了。 如果想进行隐藏，可以使用ng-hide
+代码如下: 
+<div ng-if="1+1===3">     无法审查到该元素 </div> 
+<div ng-hide="1+1==2"> 
+    可审查 </div>
+
+（15）ng-switch 
+单独使用没什么意思，下面是例子: 
+复制代码如下: 
+<div ng-switch on="1+1">     
+<p ng-switch-default>0</p>     
+<p ng-switch-when="1">1</p>     
+<p ng-switch-when="2">2</p>     
+<p ng-switch-when="3">3</p> 
+</div>
+
+（16）ng-repeat 
+不明白为毛不叫iterate，总之是遍历集合，给每个元素生成模板实例，每个实例的作用域中可以用一些特殊属性.
+
+
+（17）ng-href 
+起初我在一个文本域中弄了个ng-model，然后像这样<a href="{{myUrl}}">在href里面写了进去。 
+其实这样href和ng-href看不出什么区别，所以我们可以试试这样
+<ul ng-init="myHref=''"> 
+    <li><a ng-href="{{ myHref }}">{{linkText}}</a></li> 
+    <li><a href="{{ myHref }}">可以点击，但不一定是正确的地址</a></li> 
+</ul> 
+.run(function($rootScope, $timeout) { 
+    $rootScope.linkText = '尚未加载，您无法点击';     $timeout(function() { 
+        $rootScope.linkText = '请点击' 
+        $rootScope.myHref = 'http://google.com';     }, 2000); }) 
+
+（18）ng-src 
+大同小异，即表达式生效前不要加载该资源。 例子(ps: 图片不错! ): 
+复制代码代码如下: 
+<img ng-src="{{imgSrc}}"/> .run(function($rootScope, $timeout) {     $timeout(function() { 
+        $rootScope.imgSrc = 'https://octodex.github.com/images/daftpunktocat-guy.gif';     }, 2000); }) 
+
+（19）ng-class 
+用作用域中的对象动态改变类样式，例如: 
+复制代码代码如下: 
+ <style> 
+    .red {background-color: red;}     .blue {background-color: blue;} </style> 
+<div ng-controller="CurTimeController"> 
+    <button ng-click="getCurrentSecond()" >Get Time!</button> 
+    <p ng-class="{red: x%2==0,blue: x%2!=0}" >Number is: {{ x }}</p> 
+</div> 
+.controller('CurTimeController', function($scope) {     $scope.getCurrentSecond = function() {         $scope.x = new Date().getSeconds();     }; })
