@@ -1,0 +1,11 @@
+$scope的生命周期
+	创建$rootScope
+		注入器创建完毕后，会调用注入器的invoke方法执行bootstrapApply函数。会给该函数注入$rootScope服务，这时会创建根作用域
+	创建子$scope
+		页面所有指令编译完后的链接阶段，根据指令配置对象的scope属性，创建当前指令DOM区域及其模板的作用域scope，并将该作用域与对应模板绑定起来。
+	更新$scope
+		1.业务代码改变$scope值
+		2.双向绑定导致$scope值变化
+	销毁$scope
+		方法：$scope.$destroy()
+		时机：当前$scope对应的视图被移除、当前$scope作用域内容不被引用时。
